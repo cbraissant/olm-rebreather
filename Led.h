@@ -1,12 +1,17 @@
+/*
+    This library handle the LED connected to the Arduino Board
+*/
+
 // header guards
-#ifndef LED_H
-#define LED_H
+#ifndef Led_h
+#define Led_h
 
 #include <Arduino.h>
 
 class Led {
    private:
     byte pin;
+    byte state = LOW;
 
    public:
     Led(byte pin);
@@ -14,6 +19,7 @@ class Led {
     void on();
     void off();
     void shift();
+    byte getState();
 };
 
 // header guards
