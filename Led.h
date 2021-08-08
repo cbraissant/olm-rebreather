@@ -1,5 +1,5 @@
 /*
-    This library handle the LED connected to the Arduino Board
+    This library handle the LEDs connected to the Arduino Board
 */
 
 // header guards
@@ -11,7 +11,7 @@
 class Led {
    private:
     byte pin;
-    byte state = LOW;
+    bool state = false;
 
    public:
     Led(byte pin);
@@ -19,7 +19,7 @@ class Led {
     void on();
     void off();
     void shift();
-    byte getState();
+    bool getState();
 };
 
 // header guards

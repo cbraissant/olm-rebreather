@@ -11,16 +11,16 @@ void Led::init() {
 }
 
 void Led::off() {
-    state = LOW;
+    state = false;
     digitalWrite(pin, LOW);
 }
 
 void Led::on() {
-    state = HIGH;
+    state = true;
     digitalWrite(pin, HIGH);
 }
 
-byte Led::getState() {
+bool Led::getState() {
     return state;
 }
 
