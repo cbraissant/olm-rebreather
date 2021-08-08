@@ -24,7 +24,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT,
                          OLED_MOSI, OLED_CLK, OLED_DC, OLED_RESET, OLED_CS);
 
 /**************************************************************************
-Declaration for LED modules
+LED modules
 **************************************************************************/
 #define LED_1_PIN 7
 #define LED_2_PIN 6
@@ -33,6 +33,10 @@ Declaration for LED modules
 Led led1(LED_1_PIN);
 Led led2(LED_2_PIN);
 Led led3(LED_3_PIN);
+
+/**************************************************************************
+miscellaneous
+**************************************************************************/
 
 /**************************************************************************
 SETUP
@@ -48,7 +52,6 @@ void setup() {
     }
 
     // set the basic text size and color for the OLED display
-    display.setTextSize(TEXT_SIZE);
     display.setTextColor(WHITE, BLACK);
 
     // the library initialise the buffer of the screen with the adafruit logo
@@ -56,12 +59,21 @@ void setup() {
     display.clearDisplay();  // clear the screen
     display.display();       // update the screen
 
-    // welcome message
-    display.setCursor(0, 0);
-    display.println("Olm Rebreater");
-    display.println("Swiss Made");
+    // splah screen
+    display.setCursor(36, 5);
+    display.setTextSize(3);
+    display.print(F("OLM"));
+    display.setCursor(4, 35);
+    display.setTextSize(2);
+    display.print(F("REBREATHER"));
+    display.setCursor(24, 55);
+    display.setTextSize(1);
+    display.print(F("- Swiss Made -"));
     display.display();
+    delay(2000);
     display.clearDisplay();
+    display.setTextSize(1);
+    display.display();
 }
 
 /**************************************************************************
@@ -74,4 +86,16 @@ void loop() {
     delay(200);
     led3.shift();
     delay(200);
+}
+
+/**************************************************************************
+OLED HELPER FUNCTIONS
+**************************************************************************/
+void clearLine(int line) {
+    int startLine = line * 8;
+    for (int y = 0; y < 8; y++) {
+        for (int x = 0; x < SCREEN_WIDTH; x++) {
+            display.drawPixel(x, y, BLACK);
+        }
+    }
 }
