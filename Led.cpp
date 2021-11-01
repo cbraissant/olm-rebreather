@@ -31,3 +31,10 @@ void Led::shift() {
         off();
     }
 }
+
+void Led::blink(int interval) {
+    if (currentMillis - previousMillis >= interval) {
+        previousMillis = currentMillis;
+        shift();
+    }
+}

@@ -12,6 +12,8 @@ class Led {
    private:
     byte pin;
     bool state = false;
+    unsigned long previousMillis = 0;
+    unsigned long currentMillis = millis();
 
    public:
     Led(byte pin);
@@ -20,6 +22,7 @@ class Led {
     void off();
     void shift();
     bool getState();
+    void blink(int interval);
 };
 
 // header guards
