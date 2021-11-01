@@ -4,8 +4,9 @@
 #include <SPI.h>               // Serial Peripheral Interface communication
 #include <Wire.h>              // Communication with I2C
 
-#include "Led.h"  // Led outputs
-#include "Motor.h"
+#include "Led.h"     // Led outputs
+#include "Motor.h"   // Vellemann motor
+#include "Sensor.h"  // Oxygen sensor
 
 /**************************************************************************
 Adafruit SSD1306
@@ -54,7 +55,14 @@ Adafruit ADS1115
 16-Bit ADC - 4 Channel with Programmable Gain Amplifier
 Communication: I2C
 **************************************************************************/
-Adafruit_ADS1115 ads1115;
+#define SENSOR_1_ADC_CHANEL 0
+#define SENSOR_1_ADC_CHANEL 1
+#define SENSOR_1_ADC_CHANEL 2
+#define ADC_MULTIPLIER 16
+
+Sensor sensor1(SENSOR_1_ADC_CHANEL, ADC_MULTIPLIER);
+Sensor sensor2(SENSOR_1_ADC_CHANEL, ADC_MULTIPLIER);
+Sensor sensor3(SENSOR_1_ADC_CHANEL, ADC_MULTIPLIER);
 
 /**************************************************************************
 LED modules
@@ -76,10 +84,6 @@ SETUP
 **************************************************************************/
 void setup() {
     Serial.begin(9600);
-
-    // Setup the ADS1115
-    ads1115.begin();
-    ads1115.setGain(GAIN_SIXTEEN);
 
     // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
     if (!display.begin(SSD1306_SWITCHCAPVCC)) {
@@ -134,9 +138,9 @@ void loop() {
 
     int16_t adc0, adc1, adc2, adc3;
 
-    adc0 = ads1115.readADC_SingleEnded(0);
-    adc1 = ads1115.readADC_SingleEnded(1);
-    adc2 = ads1115.readADC_SingleEnded(2);
+    adc0 = sensor1.get_mV();
+    adc1 = sensor2.get_mV();
+    adc2 = sensor3.get_mV();
     display.setCursor(0, 0);
     display.print("Cell     0: ");
     display.print(adc0);
