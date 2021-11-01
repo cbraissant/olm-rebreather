@@ -13,7 +13,7 @@ class Led {
     byte pin;
     bool state = false;
     unsigned long previousMillis = 0;
-    unsigned long currentMillis = millis();
+    unsigned long currentMillis = 0;
 
    public:
     Led(byte pin);
