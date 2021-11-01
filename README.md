@@ -1,14 +1,23 @@
 # Olm Rebreater
 
 ## About
-Olm Rebreather is a Swiss Made diving rebreather
+Olm Rebreather is the new prototype of diving rebreather made by Swiss Diving Manufacturer
+
+## Introduction
+Electrical prototype of the oxygen delivery system in a diving rebreather.
+The system consists of an oxygen sensor analysing the breathing air in real time and a variable flow valve adjusting the mixture.
+An arduino handles the logic. LEDs and OLED screen provide feedback to the user.
 
 ## Components
-Main card: **Arduino Uno**
-OLED display: **Adafruit SSD1306 1.3" 128x64**
-Stepper Motor: **22BYJ-48**
-Stepper motor driver: **Velleman VMA401**
-Analog converter: **Adafruit ADS1115 16Bit I2C**
+| Component        | Brand / Model                |
+| ---------------- | ---------------------------- |
+| Main card        | Arduino Uno                  |
+| Oxygen sensor    | To Be Determined             |
+| Analog converter | Adafruit ADS1115 16Bit I2C   |
+| Stepper motor    | 22BYJ-48                     |
+| Stepper driver   | Velleman VMA401              |
+| OLED display     | Adafruit SSD1306 1.3" 128x64 |
+| LED              | Grove LED socket kit         |
 
 
 ## Oxygen Sensor calibration
