@@ -67,6 +67,10 @@ The resolution of will then be: 0.512 / 2^16 = 0.000007812V = 7.8125µV
 
 ## Arduino special
 
+### serial.begin()
+`serial.begin()` set the pins 0 (<-RX) et 1 (->TX). If those pins needs to be used, don't declare `serial.begin()` in the `void setup()`
+
+
 ### F() Macro
 When an instruction like :
 ```cpp
