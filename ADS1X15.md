@@ -1,6 +1,24 @@
 # Arduino Code
 The Adafruit_ADS1X15 library supports both single-ended and differential readings as well as comparator operations on both the ADS1015 and ADS1115 breakout boards.  The library uses the wiring library for I2C communication, so wiring.h must be included.
 
+ADS1015: 12 Bits
+ADS1115: 16 Bits
+
+## Resolution
+The resolution of the ADC span over the positive and negative range.
+Therefore, if the range is +/-4.096V, the resolution would be:
+12 Bits ADC1015:    (4.096 + 4.096) / 2^12 = 8.196 / 4092 = 2mV / bit
+16 Bits ADC1115:    (4.096 + 4.096) / 2^16 = 8.196 / 65536 = 125uV / bit
+
+| Gain           | Range     | ADC1015   | ADC1115   |
+|----------------|-----------|-----------|-----------|
+| GAIN_TWOTHIRDS | +/-6.144V | 3.00 mV	 | 187.50 uV |
+| GAIN_ONE       | +/-4.096V | 2.00 mV	 | 125.00 uV |
+| GAIN_TWO       | +/-2.048V | 1.00 mV	 | 62.50 uV  |
+| GAIN_FOUR      | +/-1.024V | 500.00 uV | 31.25 uV  |
+| GAIN_EIGHT     | +/-0.512V | 250.00 uV | 15.625 uV |
+| GAIN_SIXTEEN   | +/-0.256V | 125.00 uV | 7.8125 uV |
+
 ## Construction and Initialization:
 
 `Adafruit_ADS1015();`
