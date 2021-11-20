@@ -1,6 +1,6 @@
 // header guards
-#ifndef Motor_h
-#define Motor_h
+#ifndef MOTOR_H
+#define MOTOR_H
 
 #include <Arduino.h>
 
@@ -19,7 +19,7 @@
 class Motor {
    public:
     Motor(byte pin1, byte pin2, byte pin3, byte pin4);
-    void rotateSteps(int steps);
+    void rotate(bool direction);
     void clockwise();
     void anticlockwise();
     void loop();
@@ -31,18 +31,26 @@ class Motor {
     byte pin3;
     byte pin4;
 
+    const bool CLOCKWISE = 0;
+    const bool ANTICLOCKWISE = 1;
+
+    int lookup_index = 0;
+
     // initiallise the motor
     void init();
 
+    // time tracker
+    unsigned long previous_millis = 0;
+    unsigned long current_millis = 0;
+
     // motor specific variables
-    int number_of_steps = 512;        // number of steps per revolution
+    int steps_per_rev = 512;          // number of steps per revolution
     int max_steps_per_seconds = 100;  // maximum frequency of the motor
     int min_delay_btw_steps = 1250;   // minimum deley between steps, in µs
     int step_counter = 0;             // counter of steps made
 
-    int motorSpeed = 1000;   //variable to set stepper speed
+    int delay_btw_move = 2;  //variable to set stepper speed
     int count = 0;           // count of steps made
-    int countsperrev = 512;  // number of steps per full revolution
 
     // stepper lookup table (going through the table create a single step)
     int lookup[8] = {B01000, B01100, B00100, B00110, B00010, B00011, B00001, B01001};

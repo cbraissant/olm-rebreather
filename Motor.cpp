@@ -15,26 +15,38 @@ void Motor::init() {
     pinMode(pin4, OUTPUT);
 }
 
-void Motor::setOutput(int out) {
-    digitalWrite(pin1, bitRead(lookup[out], 0));
-    digitalWrite(pin2, bitRead(lookup[out], 1));
-    digitalWrite(pin3, bitRead(lookup[out], 2));
-    digitalWrite(pin4, bitRead(lookup[out], 3));
+void Motor::setOutput(int index) {
+    digitalWrite(pin1, bitRead(lookup[index], 0));
+    digitalWrite(pin2, bitRead(lookup[index], 1));
+    digitalWrite(pin3, bitRead(lookup[index], 2));
+    digitalWrite(pin4, bitRead(lookup[index], 3));
 }
 
-void Motor::rotateSteps(int steps) {
+void Motor::rotate(bool direction) {
+    current_millis = millis();
+    if (current_millis - previous_millis >= delay_btw_move) {
+        previous_millis = current_millis;
+
+        // the lookup_index is the index to loop through the lookup_table
+        // to turn clockwise, the value of the index must decrease
+        // and turn anticlockwise, it must increase
+        if (direction == CLOCKWISE) {
+            lookup_index = lookup_index + 1;
+        } else if (direction == ANTICLOCKWISE) {
+            lookup_index = lookup_index - 1;
+        }
+        // it's value should be 0 <= i <= 7
+        // using a modulo 8 is the best way to loop through the index
+        lookup_index = lookup_index % 8;
+
+        setOutput(lookup_index);
+    }
 }
 
 void Motor::clockwise() {
-    for (int i = 7; i >= 0; i--) {
-        setOutput(i);
-        delayMicroseconds(motorSpeed);
-    }
+    rotate(CLOCKWISE);
 }
 
 void Motor::anticlockwise() {
-    for (int i = 0; i < 8; i++) {
-        setOutput(i);
-        delayMicroseconds(motorSpeed);
-    }
+    rotate(ANTICLOCKWISE);
 }
