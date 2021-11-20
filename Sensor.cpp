@@ -9,6 +9,10 @@ Sensor::Sensor(int adc_channel, int adc_multiplier) {
     init();
 }
 
+bool Sensor::isCalibrated() {
+    return sensor_is_calibrated;
+}
+
 void Sensor::adjust_gain() {
     switch (this->adc_multiplier) {
         case (0):
