@@ -3,8 +3,8 @@
 */
 
 // header guards
-#ifndef Led_h
-#define Led_h
+#ifndef LED_H
+#define LED_H
 
 #include <Arduino.h>
 
@@ -12,8 +12,8 @@ class Led {
    private:
     byte pin;
     bool state = false;
-    unsigned long previousMillis = 0;
-    unsigned long currentMillis = 0;
+    unsigned long previous_millis = 0;
+    unsigned long current_millis = 0;
 
    public:
     Led(byte pin);

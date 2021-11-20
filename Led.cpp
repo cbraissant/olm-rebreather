@@ -2,40 +2,40 @@
 
 Led::Led(byte pin) {
     this->pin = pin;
-    init();
+    this->init();
 }
 
 void Led::init() {
     pinMode(pin, OUTPUT);
-    off();
+    this->off();
 }
 
 void Led::off() {
-    state = false;
+    this->state = false;
     digitalWrite(pin, LOW);
 }
 
 void Led::on() {
-    state = true;
+    this->state = true;
     digitalWrite(pin, HIGH);
 }
 
 bool Led::getState() {
-    return state;
+    return this->state;
 }
 
 void Led::shift() {
     if (digitalRead(pin) == LOW) {
-        on();
+        this->on();
     } else {
-        off();
+        this->off();
     }
 }
 
 void Led::blink(int interval) {
-    currentMillis = millis();
-    if (currentMillis - previousMillis >= interval) {
-        previousMillis = currentMillis;
-        shift();
+    this->current_millis = millis();
+    if (this->current_millis - this->previous_millis >= interval) {
+        this->previous_millis = this->current_millis;
+        this->shift();
     }
 }
