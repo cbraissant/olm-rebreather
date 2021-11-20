@@ -4,9 +4,9 @@
 #include <SPI.h>               // Serial Peripheral Interface communication
 #include <Wire.h>              // Communication with I2C
 
-#include "Led.h"     // Led outputs
-#include "Motor.h"   // Vellemann motor
-#include "Sensor.h"  // Oxygen sensor
+#include "Led.h"    // Led outputs
+#include "Motor.h"  // Vellemann motor
+// #include "Sensor.h"  // Oxygen sensor
 
 /**************************************************************************
 Adafruit SSD1306
@@ -38,11 +38,11 @@ Frequency = 100Hz = 100pps
 **************************************************************************/
 
 //declare variables for the motor pins
-#define MOTOR_PIN_1 7  // Blue   - 28BYJ48 pin 1
-#define MOTOR_PIN_2 6  // Pink   - 28BYJ48 pin 2
-#define MOTOR_PIN_3 5  // Yellow - 28BYJ48 pin 3
-#define MOTOR_PIN_4 4  // Orange - 28BYJ48 pin 4 \
-                       // Red    - 28BYJ48 pin 5 (VCC)
+#define MOTOR_PIN_1 7  // Blue          - 28BYJ48 pin 1
+#define MOTOR_PIN_2 6  // Green / Pink  - 28BYJ48 pin 2
+#define MOTOR_PIN_3 5  // Yellow        - 28BYJ48 pin 3
+#define MOTOR_PIN_4 4  // Orange        - 28BYJ48 pin 4
+
 #define STEPS_PER_REV 512
 #define MOTOR_PPS 100
 
@@ -55,21 +55,21 @@ Adafruit ADS1115
 16-Bit ADC - 4 Channel with Programmable Gain Amplifier
 Communication: I2C
 **************************************************************************/
-#define SENSOR_1_ADC_CHANEL 0
-#define SENSOR_1_ADC_CHANEL 1
-#define SENSOR_1_ADC_CHANEL 2
-#define ADC_MULTIPLIER 16
+// #define SENSOR_1_ADC_CHANEL 0
+// #define SENSOR_2_ADC_CHANEL 1
+// #define SENSOR_3_ADC_CHANEL 2
+// #define ADC_MULTIPLIER 16
 
-Sensor sensor1(SENSOR_1_ADC_CHANEL, ADC_MULTIPLIER);
-Sensor sensor2(SENSOR_1_ADC_CHANEL, ADC_MULTIPLIER);
-Sensor sensor3(SENSOR_1_ADC_CHANEL, ADC_MULTIPLIER);
+// Sensor sensor1(SENSOR_1_ADC_CHANEL, ADC_MULTIPLIER);
+// Sensor sensor2(SENSOR_2_ADC_CHANEL, ADC_MULTIPLIER);
+// Sensor sensor3(SENSOR_3_ADC_CHANEL, ADC_MULTIPLIER);
 
 /**************************************************************************
 LED modules
 **************************************************************************/
-#define LED_1_PIN 0
-#define LED_2_PIN 1
-#define LED_3_PIN 2
+#define LED_1_PIN 0  // red
+#define LED_2_PIN 1  // green
+#define LED_3_PIN 2  // white
 
 Led led1(LED_1_PIN);
 Led led2(LED_2_PIN);
@@ -83,8 +83,6 @@ miscellaneous
 SETUP
 **************************************************************************/
 void setup() {
-    Serial.begin(9600);
-
     // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
     if (!display.begin(SSD1306_SWITCHCAPVCC)) {
         Serial.println(F("SSD1306 allocation failed"));
@@ -115,45 +113,51 @@ void setup() {
     display.clearDisplay();
     display.setTextSize(1);
     display.display();
+    pinMode(0, OUTPUT);
 }
 
 /**************************************************************************
 MAIN LOOP
 **************************************************************************/
 void loop() {
-    if (counter == 0) {
-        for (int i = 0; i < 512; i++) {
-            motor1.clockwise();
-        }
-    }
-    counter = 1;
-    delay(1000);
+    // if calibration need to been done
+    //      blink leds
+    //      alert message oled
+    // else
+    //      read setpoint
+    //      read O2
+    //      if O2 > setpoint        ⚠︎ hysteresis to avoid jerky movements
+    //          close valve
+    //      else
+    //          open valve
+    //      update led
+    //      update OLED
+    //
+    motor1.clockwise();
 
-    led1.shift();
-    delay(200);
-    led2.shift();
-    delay(200);
-    led3.shift();
-    delay(200);
+    led1.blink(1000);
+    led2.blink(800);
+    led3.blink(600);
 
     int16_t adc0, adc1, adc2, adc3;
 
-    adc0 = sensor1.get_mV();
-    adc1 = sensor2.get_mV();
-    adc2 = sensor3.get_mV();
-    display.setCursor(0, 0);
-    display.print("Cell     0: ");
-    display.print(adc0);
-    display.println(" ");
-    display.print("Cell 1: ");
-    display.println(adc1);
-    display.print("Cell 2: ");
-    display.println(adc2);
-    display.println(" ");
-    display.display();
-
-    delay(200);
+    // adc0 = sensor1.get_mV();
+    // adc1 = sensor2.get_mV();
+    // adc2 = sensor3.get_mV();
+    // display.setCursor(0, 0);
+    // display.print("Cell 0: ");
+    // display.print(adc0);
+    // display.println(" ");
+    // display.print("Cell 1: ");
+    // display.println(adc1);
+    // display.print("Cell 2: ");
+    // display.println(adc2);
+    // display.println(" ");
+    // display.print("Time: ");
+    // display.println(millis());
+    // display.display();   // SLOW DOWN THE LOOP!!! NEED TO UPDATE LESS!!!!
 }
+
 
 /**************************************************************************
 OLED HELPER FUNCTIONS
@@ -164,5 +168,16 @@ void clearLine(int line) {
         for (int x = 0; x < SCREEN_WIDTH; x++) {
             display.drawPixel(x, y, BLACK);
         }
+    }
+}
+
+void updateMainScreen() {
+    const unsigned long interval = 500;
+    unsigned long previous_millis = 0;
+    unsigned long current_millis = millis();
+
+    if (current_millis - previous_millis >= interval) {
+        previous_millis = current_millis;
+        
     }
 }
