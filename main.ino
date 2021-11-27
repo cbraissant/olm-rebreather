@@ -4,15 +4,16 @@
 #include <SPI.h>               // Serial Peripheral Interface communication
 #include <Wire.h>              // Communication with I2C
 
-#include "Led.h"    // Led outputs
-#include "Motor.h"  // Vellemann motor
-// #include "Sensor.h"  // Oxygen sensor
+#include "Led.h"          // Led outputs
+#include "Motor.h"        // Vellemann motor
+#include "Sensor.h"       // Oxygen sensor
+#include "TimedAction.h"  // Trigger function on set interval
 
-/**************************************************************************
+/************************************************
 Adafruit SSD1306
 1.3" 128x64 OLED Display
 Communication: SPI(default) ou I2C
-**************************************************************************/
+************************************************/
 #define SCREEN_WIDTH 128  // OLED display width, in pixels
 #define SCREEN_HEIGHT 64  // OLED display height, in pixels
 
@@ -27,7 +28,7 @@ Communication: SPI(default) ou I2C
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT,
                          OLED_MOSI, OLED_CLK, OLED_DC, OLED_RESET, OLED_CS);
 
-/**************************************************************************
+/************************************************
 Vellemann VMA401 Driver
 28BYJ-48 Stepper motor
 Steps / revolution: 64
@@ -35,7 +36,7 @@ Step angle: 360 / 64 = 5.625ª
 Frequency = 100Hz = 100pps
 100pps * 60s = 6000ppm
 6000 / 64 = 93.75 rpm 
-**************************************************************************/
+************************************************/
 
 //declare variables for the motor pins
 #define MOTOR_PIN_1 7  // Blue          - 28BYJ48 pin 1
@@ -50,39 +51,58 @@ Motor motor1(MOTOR_PIN_1, MOTOR_PIN_2, MOTOR_PIN_3, MOTOR_PIN_4);
 
 int counter = 0;
 
-/**************************************************************************
+/************************************************
 Adafruit ADS1115
 16-Bit ADC - 4 Channel with Programmable Gain Amplifier
 Communication: I2C
-**************************************************************************/
-// #define SENSOR_1_ADC_CHANEL 0
-// #define SENSOR_2_ADC_CHANEL 1
-// #define SENSOR_3_ADC_CHANEL 2
-// #define ADC_MULTIPLIER 16
+The gain of the ADC can only be adjusted for the card
+and not for each channel
+************************************************/
+#define ADC_MULTIPLIER 16
+#define ADC_RESOLUTION 0.0078125
+#define CELL_1_CHANNEL 0
+#define CELL_2_CHANNEL 1
+#define CELL_3_CHANNEL 2
+#define CELL_4_CHANNEL 3
 
-// Sensor sensor1(SENSOR_1_ADC_CHANEL, ADC_MULTIPLIER);
-// Sensor sensor2(SENSOR_2_ADC_CHANEL, ADC_MULTIPLIER);
-// Sensor sensor3(SENSOR_3_ADC_CHANEL, ADC_MULTIPLIER);
+Adafruit_ADS1115 ads1115;
 
-/**************************************************************************
+Sensor sensor_a(ads1115, CELL_1_CHANNEL, ADC_RESOLUTION);
+Sensor sensor_b(ads1115, CELL_2_CHANNEL, ADC_RESOLUTION);
+Sensor sensor_c(ads1115, CELL_3_CHANNEL, ADC_RESOLUTION);
+Sensor sensor_d(ads1115, CELL_4_CHANNEL, ADC_RESOLUTION);
+
+/************************************************
 LED modules
-**************************************************************************/
-#define LED_1_PIN 0  // red
-#define LED_2_PIN 1  // green
-#define LED_3_PIN 2  // white
+************************************************/
+#define LED_0_PIN 0  // red
+#define LED_1_PIN 1  // green
+#define LED_2_PIN 2  // white
 
-Led led1(LED_1_PIN);
-Led led2(LED_2_PIN);
-Led led3(LED_3_PIN);
+Led led_red(LED_0_PIN);
+Led led_green(LED_1_PIN);
+Led led_white(LED_2_PIN);
 
-/**************************************************************************
-miscellaneous
-**************************************************************************/
+/************************************************
+Timed Actions
+************************************************/
+void updateDisplay();
+TimedAction TimedDisplay(1000, updateDisplay);
 
-/**************************************************************************
+void updateSerial();
+TimedAction TimedSerial(1000, updateSerial);
+
+/************************************************
 SETUP
-**************************************************************************/
+************************************************/
 void setup() {
+    /*
+     * initialise serial communication at 9600 bits per second
+     * With serial port initialised, I/O "RX<-0" and "TX->1"
+     * are reserved for serial communications
+     */
+    Serial.begin(9600);
+
     // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
     if (!display.begin(SSD1306_SWITCHCAPVCC)) {
         Serial.println(F("SSD1306 allocation failed"));
@@ -109,16 +129,21 @@ void setup() {
     display.setTextSize(1);
     display.print(F("- Swiss Made -"));
     display.display();
-    // delay(2000);
+    delay(1000);
     display.clearDisplay();
     display.setTextSize(1);
     display.display();
     pinMode(0, OUTPUT);
+
+    // initialize the ADS1115
+    ads1115.begin();
+    ads1115.setGain(GAIN_ONE);
+    Serial.println(ads1115.getGain());
 }
 
-/**************************************************************************
+/************************************************
 MAIN LOOP
-**************************************************************************/
+************************************************/
 void loop() {
     // if calibration need to been done
     //      blink leds
@@ -135,33 +160,15 @@ void loop() {
     //
     motor1.clockwise();
 
-    led1.blink(1000);
-    led2.blink(800);
-    led3.blink(600);
+    led_white.blink(1000);
 
-    int16_t adc0, adc1, adc2, adc3;
-
-    // adc0 = sensor1.get_mV();
-    // adc1 = sensor2.get_mV();
-    // adc2 = sensor3.get_mV();
-    // display.setCursor(0, 0);
-    // display.print("Cell 0: ");
-    // display.print(adc0);
-    // display.println(" ");
-    // display.print("Cell 1: ");
-    // display.println(adc1);
-    // display.print("Cell 2: ");
-    // display.println(adc2);
-    // display.println(" ");
-    // display.print("Time: ");
-    // display.println(millis());
-    // display.display();   // SLOW DOWN THE LOOP!!! NEED TO UPDATE LESS!!!!
+    TimedSerial.check();
+    TimedDisplay.check();
 }
 
-
-/**************************************************************************
+/************************************************
 OLED HELPER FUNCTIONS
-**************************************************************************/
+************************************************/
 void clearLine(int line) {
     int startLine = line * 8;
     for (int y = 0; y < 8; y++) {
@@ -171,13 +178,25 @@ void clearLine(int line) {
     }
 }
 
-void updateMainScreen() {
-    const unsigned long interval = 500;
-    unsigned long previous_millis = 0;
-    unsigned long current_millis = millis();
+void updateSerial() {
+    Serial.print("Sensor.cpp: ");
+    Serial.print(sensor_a.read_value());
+    Serial.println();
+}
 
-    if (current_millis - previous_millis >= interval) {
-        previous_millis = current_millis;
-        
-    }
+void updateDisplay() {
+    display.setCursor(0, 0);
+    display.print("Cell a: ");
+    display.println(sensor_a.read_value());
+
+    display.print("Cell b: ");
+    display.println(sensor_b.read_value());
+
+    display.print("Cell c: ");
+    display.println(sensor_c.read_value());
+    display.println(" ");
+
+    display.print("Time: ");
+    display.println(millis());
+    display.display();
 }
