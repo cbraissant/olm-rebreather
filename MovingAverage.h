@@ -7,7 +7,7 @@ class MovingAverage {
    public:
     MovingAverage(int max_length);
     void writeValue(int new_value);
-    int readAverage();
+    float readAverage();
     void reset();
 
    private:

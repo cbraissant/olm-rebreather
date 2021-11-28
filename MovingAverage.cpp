@@ -19,7 +19,7 @@ void MovingAverage::writeValue(int new_value) {
     }
 }
 
-int MovingAverage::readAverage() {
+float MovingAverage::readAverage() {
     return sum / length;
 }
 
